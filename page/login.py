@@ -26,7 +26,7 @@ def show_login_data():
             st.write("ID:", user.user.id)
             st.write("Created at:", user.user.created_at)
             st.write("Last sign-in at:", user.user.last_sign_in_at)
-            st.write("Повне Імʼя:", user.user.full_name)
+            st.write("Повне Імʼя:", user.user.user_metadata.get("full_name", ""))
             st.session_state["user"] = user
         except Exception as e:
             st.error("Login failed")
