@@ -4,6 +4,7 @@ from streamlit_option_menu import option_menu
 from data_loader import df_make
 from page.district import show_data as district_data
 from sidebar_filter.sidebar import render_sidebar_filters as sidebar_data
+from page.login import show_login_data as login
 
 with st.sidebar:
 
@@ -24,6 +25,7 @@ with st.sidebar:
 
 if selected == "Головна":
     st.warning("Спочатку завантажте файл на сторінці \"Завантаження\" в бічній панелі")
+    login()
 elif selected == "Завантаження":
     if "df" not in st.session_state:
         st.warning("Спочатку завантажте файл на сторінці в бічній панелі")
