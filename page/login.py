@@ -15,6 +15,7 @@ def show_login_data():
     if "user" not in st.session_state:
         email = st.text_input("Email")
         password = st.text_input("Password", type="password")
+        uploaded_file = st.file_uploader("Оберіть файл")
 
         if st.button("Login"):
             try:
