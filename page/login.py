@@ -22,6 +22,10 @@ def show_login_data():
                 "password": password
             })
             st.success(f"Logged in as: {user.user.email}")
+            st.write("Email:", user.user.email)
+            st.write("ID:", user.user.id)
+            st.write("Created at:", user.user.created_at)
+            st.write("Last sign-in at:", user.user.last_sign_in_at)
         except Exception as e:
             st.error("Login failed")
             st.exception(e)
