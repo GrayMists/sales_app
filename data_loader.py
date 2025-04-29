@@ -67,5 +67,4 @@ def df_make():
             st.success("Дані успішно завантажені з посилання!")
             st.session_state.df = df
 
-    if not df.empty:
-        st.write("Колонки таблиці:", list(df.columns))
+    
