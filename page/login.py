@@ -43,19 +43,25 @@ def show_login_data():
                 "full_name": full_name
             }
 
-        with st.form("profile_form"):
-            new_full_name = st.text_input("Full Name", value=full_name)
-            submitted = st.form_submit_button("Update Profile")
+        if not full_name:
+            with st.form("profile_form"):
+                new_full_name = st.text_input("Full Name", value=full_name)
+                submitted = st.form_submit_button("Update Profile")
+        else:
+            with st.expander("Оновити повне імʼя"):
+                with st.form("profile_form"):
+                    new_full_name = st.text_input("Full Name", value=full_name)
+                    submitted = st.form_submit_button("Update Profile")
 
-            if submitted:
-                try:
-                    supabase.auth.update_user({
-                        "data": {
-                            "full_name": new_full_name
-                        }
-                    })
-                    st.success("Profile updated!")
-                    st.session_state.user_data["full_name"] = new_full_name
-                except Exception as e:
-                    st.error("Update failed")
-                    st.exception(e)
+        if submitted:
+            try:
+                supabase.auth.update_user({
+                    "data": {
+                        "full_name": new_full_name
+                    }
+                })
+                st.success("Profile updated!")
+                st.session_state.user_data["full_name"] = new_full_name
+            except Exception as e:
+                st.error("Update failed")
+                st.exception(e)
