@@ -1,9 +1,5 @@
 import streamlit as st
 
-
-
-import streamlit as st
-
 def render_sidebar_filters():
     """Відображає фільтри у контейнері"""
     if "df" not in st.session_state:
