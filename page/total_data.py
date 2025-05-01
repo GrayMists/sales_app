@@ -13,6 +13,7 @@ def show_data():
 
     region = profile.get("region")
     line = profile.get("line")
+    type = profile.get("type")
 
     # Перевірка, чи є дані
     df = st.session_state.get("df")
@@ -20,22 +21,26 @@ def show_data():
         st.warning("Спочатку завантажте файл на сторінці 'Завантаження'")
         return
 
-    # Фільтрація та обробка даних
-    filtered_df = process_filtered_df(df, region)
+    if type != "admin":
+        # Фільтрація та обробка даних
+        filtered_df = process_filtered_df(df, region)
 
-    mr_df = filtered_df[
-        (filtered_df["Територія"] == profile["territory"])&
-        (filtered_df["Лінія"] == profile["line"])
-         ]
-    st.subheader("Дані по території користувача")
-    group_by_product = mr_df.groupby("Найменування")["Кількість"].sum().reset_index()
-    col1, col2, = st.columns([2,4])
+        mr_df = filtered_df[
+            (filtered_df["Територія"] == profile["territory"])&
+            (filtered_df["Лінія"] == profile["line"])
+            ]
+        st.subheader("Дані по території користувача")
+        group_by_product = mr_df.groupby("Найменування")["Кількість"].sum().reset_index()
+        col1, col2, = st.columns([2,4])
 
-    with col1:
-        st.dataframe(group_by_product, use_container_width=True, hide_index=True)
-    with col2:   
-        st.dataframe(mr_df, use_container_width=True, hide_index=True)
-    # Виведення таблиці
-    st.subheader("Всі дані по регіону")
-    st.dataframe(filtered_df)
+        with col1:
+            st.dataframe(group_by_product, use_container_width=True, hide_index=True)
+        with col2:   
+            st.dataframe(mr_df, use_container_width=True, hide_index=True)
+        # Виведення таблиці
+        st.subheader("Всі дані по регіону")
+        st.dataframe(filtered_df)
+    else:
+        st.subheader("Всі дані по регіону")
+        st.dataframe(filtered_df)
     
