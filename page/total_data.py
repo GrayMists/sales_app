@@ -28,7 +28,7 @@ def show_data():
         (filtered_df["Лінія"] == profile["line"])
          ]
     st.subheader("Дані по території користувача")
-    group_by_product = mr_df.groupby("Найменвання")["Кількість"].sum().reset_index()
+    group_by_product = mr_df.groupby("Найменування")["Кількість"].sum().reset_index()
     col1, col2, = st.columns([2,4])
 
     with col1:
