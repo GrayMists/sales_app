@@ -12,7 +12,7 @@ def show_data():
 
     if "user" in st.session_state:
         user = st.session_state["user"]
-        full_name = user.user_metadata.get("full_name", "Користувач")
+        full_name = profile["full_name"]
         email = user.email
         profile = st.session_state["profile"]
         territory = profile["territory"]
