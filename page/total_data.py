@@ -21,7 +21,7 @@ def show_data():
         return
 
     # Фільтрація та обробка даних
-    filtered_df = process_filtered_df(filtered_df, region)
+    filtered_df = process_filtered_df(df, region)
 
     mr_df = filtered_df[
         (filtered_df["Територія"] == profile["territory"])&
@@ -39,5 +39,3 @@ def show_data():
     st.subheader("Всі дані по регіону")
     st.dataframe(filtered_df)
     
-
-  
