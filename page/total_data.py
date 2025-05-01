@@ -11,8 +11,8 @@ def show_data():
         st.warning("Не знайдено профіль користувача.")
         return
 
-    region = profile.get["region"]
-    line = profile.get["line"]
+    region = profile.get("region")
+    line = profile.get("line")
 
     # Перевірка, чи є дані
     df = st.session_state.get("df")
