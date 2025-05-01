@@ -2,12 +2,15 @@ import streamlit as st
 from supabase import create_client, Client
 
 
-
-
 url = st.secrets["SUPABASE_URL"]
 key = st.secrets["SUPABASE_KEY"]
 
-supabase: Client = create_client(url, key)
+# Перевірка чи вже є клієнт у session_state
+if "supabase" not in st.session_state:
+    st.session_state.supabase = create_client(url, key)
+
+# Використовуємо supabase з session_state
+supabase = st.session_state.supabase
 
 def show_login_data():
     st.title("Увійдіть у свій аккаунт")
@@ -25,6 +28,15 @@ def show_login_data():
                 })
                 
                 st.session_state["user"] = user.user
+                # Отримуємо профіль користувача
+                user_id = user.user.id
+                response = supabase.table("profiles").select("*").eq("id", user_id).single().execute()
+                
+                if response.data:
+                    st.session_state["profile"] = response.data
+                else:
+                    st.warning("Профіль користувача не знайдено.")
+                
                 st.rerun()
             except Exception as e:
                 st.error("Login failed")

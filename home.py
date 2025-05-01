@@ -7,22 +7,20 @@ from page.total_data import show_data as total_data
 from page.region import show_data as region_data
 from sidebar_filter.sidebar import render_sidebar_filters as sidebar_data
 from page.login import show_login_data as login
+from user_utils import show_data as user
+
+st.set_page_config(
+    page_title="Salae board",
+    page_icon="⚡️",
+    layout="wide"
+)
 
 if "user" not in st.session_state:
     login()
     st.stop()
 
 with st.sidebar:
-    if "user" in st.session_state:
-        user = st.session_state["user"]
-        full_name = user.user_metadata.get("full_name", "Користувач")
-        email = user.email
-    with st.container(border=True):
-        st.markdown(
-            f"<h3 style='text-align: center;'>👤 {full_name}</h3>"
-            f"<h4 style='text-align: center;'>{email}</h4>",
-            unsafe_allow_html=True
-        )
+    user()
     selected = option_menu(
         menu_title=None,
         options=["Головна","Регіони", "Область"],
