@@ -1,18 +1,10 @@
 import streamlit as st
 import pandas as pd
+from data_processor import process_excel_df
 
 
-
-# Функція для отримання даних з excel файлу
 def load_excel_data(file):
-    df = pd.read_excel(file)
-    st.success("Файл успішно завантажено!")
-    df.columns = df.columns.str.replace(" ", "")  # Видаляємо пробіли з назв колонок
-    excluded_columns = ["Adding", "ЄДРПОУ", "Юр.адресаклієнта"]
-    df = df.drop(columns=[col for col in excluded_columns if col in df.columns], errors="ignore")
-    df = df[df['Регіон'].isin(["24. Тернопіль", "10. Івано-Франк", "21. Ужгород"])]
-    df = df.reset_index(drop=True)
-    return df
+    return pd.read_excel(file)
 
 def df_make():
     st.divider()
@@ -24,11 +16,10 @@ def df_make():
         if uploaded_file.name.endswith((".xlsx", ".xls")):
             try:
                 df = load_excel_data(uploaded_file)
+                df = process_excel_df(df)
                 st.session_state.df = df
                 st.rerun()
             except Exception as e:
                 st.error(f"Помилка при зчитуванні файлу: {e}")
         else:
             st.error("Будь ласка, завантажте Excel-файл (.xlsx або .xls)")
-
-    

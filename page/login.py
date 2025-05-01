@@ -10,14 +10,14 @@ key = st.secrets["SUPABASE_KEY"]
 supabase: Client = create_client(url, key)
 
 def show_login_data():
-    st.title("Login with Supabase")
+    st.title("Увійдіть у свій аккаунт")
 
     if "user" not in st.session_state:
-        email = st.text_input("Email")
-        password = st.text_input("Password", type="password")
+        email = st.text_input("Електронна пошта")
+        password = st.text_input("Пароль", type="password")
 
 
-        if st.button("Login"):
+        if st.button("Увійти"):
             try:
                 user = supabase.auth.sign_in_with_password({
                     "email": email,
