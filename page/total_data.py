@@ -11,7 +11,8 @@ def show_data():
         st.warning("Не знайдено профіль користувача.")
         return
 
-    region = profile["region"]
+    region = profile.get["region"]
+    line = profile.get["line"]
 
     # Перевірка, чи є дані
     df = st.session_state.get("df")
@@ -20,12 +21,20 @@ def show_data():
         return
 
     # Фільтрація та обробка даних
-    filtered_df = df[df["Регіон"] == region]
     filtered_df = process_filtered_df(filtered_df, region)
 
-    mr_df = filtered_df[filtered_df["Територія"] == profile["territory"]]
+    mr_df = filtered_df[
+        (filtered_df["Територія"] == profile["territory"])&
+        (filtered_df["Лінія"] == profile["line"])
+         ]
     st.subheader("Дані по території користувача")
-    st.dataframe(mr_df, use_container_width=True, hide_index=True)
+    group_by_product = mr_df.groupby("Найменвання")["Кількість"].sum().reset_index()
+    col1, col2, = st.columns([2,4])
+
+    with col1:
+        st.dataframe(group_by_product, use_container_width=True, hide_index=True)
+    with col2:   
+        st.dataframe(mr_df, use_container_width=True, hide_index=True)
     # Виведення таблиці
     st.subheader("Всі дані по регіону")
     st.dataframe(filtered_df)
