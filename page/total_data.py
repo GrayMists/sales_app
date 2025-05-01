@@ -5,22 +5,30 @@ from data_cleaner import process_filtered_df
 
 
 def show_data():
-    if "profile" in st.session_state:
-        profile = st.session_state["profile"]
-        region = profile["region"]
+    # Перевірка наявності даних у сесії
+    profile = st.session_state.get("profile")
+    if not profile:
+        st.warning("Не знайдено профіль користувача.")
+        return
+
+    region = profile["region"]
+
     # Перевірка, чи є дані
-    if "df" not in st.session_state:
+    df = st.session_state.get("df")
+    if df is None:
         st.warning("Спочатку завантажте файл на сторінці 'Завантаження'")
         return
-    df = st.session_state.df
 
-    new_df = df[df["Регіон"] == region]
-    
+    # Фільтрація та обробка даних
+    filtered_df = df[df["Регіон"] == region]
+    filtered_df = process_filtered_df(filtered_df, region)
 
-    process_filtered_df(new_df,region)
-
-
-    st.write(new_df)
+    mr_df = filtered_df[filtered_df["Територія"] == profile["territory"]]
+    st.subheader("Дані по території користувача")
+    st.dataframe(mr_df, use_container_width=True, hide_index=True)
+    # Виведення таблиці
+    st.subheader("Всі дані по регіону")
+    st.dataframe(filtered_df)
     
 
   

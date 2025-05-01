@@ -32,5 +32,4 @@ def show_data():
     show_region_columns(df)
     district_filter = get_selected_region()
 
-    st.write(district_filter)
     st.write(df[df["Регіон"] == district_filter])
