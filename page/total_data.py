@@ -20,11 +20,11 @@ def show_data():
     if df is None:
         st.warning("Спочатку завантажте файл на сторінці 'Завантаження'")
         return
+    
+    filtered_df = process_filtered_df(df, region)
 
     if type != "admin":
         # Фільтрація та обробка даних
-        filtered_df = process_filtered_df(df, region)
-
         mr_df = filtered_df[
             (filtered_df["Територія"] == profile["territory"])&
             (filtered_df["Лінія"] == profile["line"])
