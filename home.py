@@ -33,8 +33,7 @@ with st.sidebar:
     )
     if selected == "Регіони":
         sidebar_data()
-    elif selected == "Головна":
-        sidebar_data_total_data()
+
 
 
 if selected == "Головна":
