@@ -31,12 +31,13 @@ def show_data():
             ]
         st.subheader("Дані по території користувача")
         group_by_product = mr_df.groupby("Найменування")["Кількість"].sum().reset_index()
+        group_by_city = mr_df.groupby(["Місто","Найменування"])["Кількість"].sum().reset_index()
         col1, col2, = st.columns([2,4])
 
         with col1:
             st.dataframe(group_by_product, use_container_width=True, hide_index=True)
         with col2:   
-            st.dataframe(mr_df, use_container_width=True, hide_index=True)
+            st.dataframe(group_by_city, use_container_width=True, hide_index=True)
         # Виведення таблиці
         st.subheader("Всі дані по регіону")
         st.dataframe(filtered_df)
