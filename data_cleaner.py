@@ -68,9 +68,9 @@ def mr_district(text, dict):
         return dict.get(text, "").strip()
     return text
 #Функція яка визначає приналежність до певної території відповідно до вулиці в місті
-def update_territory_for_city_streets(df, city_name, street_dict):
+def update_territory_for_city_streets(df, city_name, street_dict, city):
     def update_row(row):
-        if row["Регіон"] == city_name:
+        if row["Регіон"] == city_name and row["Місто"] == city:
             for street_key, territory in street_dict.items():
                 if pd.notna(row["Вулиця"]) and street_key in row["Вулиця"]:
                     return territory
@@ -89,7 +89,7 @@ def assign_line_from_product_name(name):
 
 
 #Функцію очищення колонки адреси, та отримання нових колонок міста, вулиці та номеру бодинку
-def clean_delivery_address(df, column,region_name,  region_values, city_values,street_values,street_mr,territory):
+def clean_delivery_address(df, column,region_name,  region_values, city_values,street_values,street_mr,territory,city):
     df[column] = (
         df[column]
         .apply(lambda x: remove_unwanted(x, region_values=region_values))
@@ -103,11 +103,11 @@ def clean_delivery_address(df, column,region_name,  region_values, city_values,s
     df["Номер будинку"] = df[column].apply(extract_num_house).str.strip()
      # Додаємо категоризацію по території, для подальшого зручнішого групування
     df["Територія"] = df["Місто"].apply(lambda x: mr_district(x, territory))
-    df = update_territory_for_city_streets(df, region_name, street_mr)
+    df = update_territory_for_city_streets(df, region_name, street_mr, city)
     df["Лінія"] = df["Найменування"].apply(assign_line_from_product_name)
     return df.reset_index(drop=True)
 
-def process_filtered_df(df, region_name):
+def process_filtered_df(df, region_name,city):
     df = df[df["Регіон"] == region_name]
     # Логіка для того щоб датасет очищався з допомогою відповідних словників під регіон
     if region_name == "Тернопільська":
@@ -125,7 +125,6 @@ def process_filtered_df(df, region_name):
 
     col = "Факт.адресадоставки"
 
-    df = clean_delivery_address(df, col,region_name, region_values,city_values,street_values,street_mr,territory)
+    df = clean_delivery_address(df, col,region_name, region_values,city_values,street_values,street_mr,territory,city)
 
     return df.reset_index(drop=True)
-

@@ -6,6 +6,7 @@ from page.district import show_data as district_data
 from page.total_data import show_data as total_data
 from page.region import show_data as region_data
 from sidebar_filter.sidebar import render_sidebar_filters as sidebar_data
+from sidebar_filter.sidebar import render_sidebar_filters_total_data as sidebar_data_total_data
 from page.login import show_login_data as login
 from user_utils import show_data as user
 
@@ -32,6 +33,8 @@ with st.sidebar:
     )
     if selected == "Регіони":
         sidebar_data()
+    elif selected == "Головна":
+        sidebar_data_total_data()
 
 
 if selected == "Головна":
@@ -39,7 +42,6 @@ if selected == "Головна":
         st.warning("Спочатку завантажте файл")
         df_make()
     else:
-        st.success("Дані успішно завантажено, оберіть відповідну сторінку в бічній панелі для подальшої роботи")
         total_data()
 elif selected == "Область":
     st.write("Тут буде відображатись інформація щодо продаж в області представника що увійшов")
