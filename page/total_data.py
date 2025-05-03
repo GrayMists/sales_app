@@ -101,9 +101,7 @@ def show_data():
             with st.expander("Продажі у вибраному населеному пункті по вулицях (натисніть для перегляду)",icon="⬇️"):
                 unique_city_street = st.selectbox('Оберіть населений пункт',mr_df["Місто"].unique(),key='select_city_streer')
                 filtered_streets = mr_df[mr_df["Місто"] == unique_city_street]["Вулиця"].unique()
-
                 unique_street = st.selectbox('Оберіть вулицю',filtered_streets,key='select_streer')
-                st.write(mr_df[mr_df["Місто"] == unique_city_street]["Вулиця"].unique())
                 group_by_street_product = mr_df[(mr_df["Місто"] == unique_city_street) & (mr_df["Вулиця"] == unique_street)].groupby(["Місто","Вулиця", "Найменування"])["Кількість"].sum().reset_index()
                 st.dataframe(group_by_street_product.drop(columns=["Місто"]), use_container_width=True, hide_index=True)
         # Виведення таблиці
