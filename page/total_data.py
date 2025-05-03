@@ -112,7 +112,9 @@ def show_data():
         with st.expander("Всі дані по регіону"):
             st.dataframe(filtered_df)
     else:
+        
         users = get_users_profile()
+        st.write(users)
 
         # Перевірка на порожні дані
         if users.empty:
