@@ -94,7 +94,7 @@ def clean_delivery_address(df, column,region_name,  region_values, city_values,s
         df[column]
         .apply(lambda x: remove_unwanted(x, region_values=region_values))
         .apply(lambda x: replacement_city(x, city_values=city_values))
-        .str.replace(" ", "")
+        #.str.replace(" ", "")
         .apply(lambda x: replacement_street(x, street_values=street_values))
         .str.replace(",,", ",", regex=True)
     )
