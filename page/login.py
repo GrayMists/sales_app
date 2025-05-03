@@ -9,13 +9,13 @@ key = st.secrets["SUPABASE_KEY"]
 
 
 
+# Ініціалізація клієнта Supabase
+def init_supabase():
+    if "supabase" not in st.session_state:
+        st.session_state.supabase = create_client(url, key)
+    return st.session_state.supabase
 
-# Перевірка чи вже є клієнт у session_state
-if "supabase" not in st.session_state:
-    st.session_state.supabase = create_client(url, key)
-
-# Використовуємо supabase з session_state
-supabase = st.session_state.supabase
+supabase = init_supabase()
 
 
 def show_login_data():

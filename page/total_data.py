@@ -1,7 +1,8 @@
 import streamlit as st
 import pandas as pd
 from data_cleaner import process_filtered_df
-from .login import supabase
+from user_utils import get_users_profile
+
 
 
 
@@ -30,8 +31,6 @@ def show_data():
         return
     #Логіка якщо зайшов користувач з типом адмін, в нього має бути доступ до всіх регіонів
     if type == "admin":
-        # Переконайтесь, що профілі завантажені
-        
         select_region = st.selectbox(
             "Оберіть регіон",
             df["Регіон"].unique(),
@@ -53,7 +52,7 @@ def show_data():
         filtered_df = process_filtered_df(df, region, city)
     #Якщо зайшов користувач з типом не адмін
     if type != "admin":
-
+        
         # Фільтрація та обробка даних
         mr_df = filtered_df[
             (filtered_df["Територія"] == profile["territory"])&
@@ -112,25 +111,13 @@ def show_data():
             st.dataframe(filtered_df[~filtered_df["Територія"].isin(["Територія 1", "Територія 2"])])
         with st.expander("Всі дані по регіону"):
             st.dataframe(filtered_df)
-    else:   
-        # if "supabase" not in st.session_state:
-        #     # Ініціалізація supabase тільки якщо його немає в session_state
-        #     st.session_state.supabase = supabase  # Переконайтесь, що ви правильно ініціалізуєте supabase
-
-        # # Тепер ви можете використовувати supabase з session_state
-        # supabase = st.session_state.supabase
-
-        response = supabase.table("profiles").select("*").execute()
-
-        # Виведення відповіді з Supabase для перевірки
-        st.write("📦 Відповідь з Supabase:", response)
-
-        if response.data:
-            profiles = response.data
-            st.session_state["all_profiles"] = profiles  # Зберігаємо у session_state
-        else:
-            profiles = []
-            st.warning("Не знайдено профілів у базі даних.")
-
-        st.write(st.session_state)
-        st.dataframe(filtered_df)
+    else:
+        users = get_users_profile()   
+        med_rep = (users[(users['region'] == select_region) & (users['type'] != 'admin')])
+        select_user_for_view = st.selectbox("Оберіть медпредставника",med_rep['full_name'].unique(), key='select_user_for_view')
+        user_for_view = med_rep.drop(['id','email',"nickname"], axis=1).reset_index()
+        
+        select_user = user_for_view[user_for_view['full_name'] == select_user_for_view]
+        st.write(select_user)
+        med_rep_final_df = filtered_df[(filtered_df['Територія'] == select_user['territory'].iloc[0]) & (filtered_df['Лінія'] == select_user['line'].iloc[0])]
+        st.dataframe(med_rep_final_df)

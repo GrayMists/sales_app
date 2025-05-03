@@ -1,28 +1,16 @@
 import streamlit as st
+import pandas as pd
+from page.login import init_supabase
 
 
 
 
 
-def load_all_profiles(supabase):
-    if supabase is None:
-        if "supabase" not in st.session_state:
-            st.error("❌ Немає підключення до Supabase.")
-            return
-        supabase = st.session_state.supabase
-
-    try:
-        response = supabase.table("profiles").select("*").execute()
-        st.write("📦 Відповідь з Supabase:", response)  # <-- Додано
-        profiles = response.data
-        if profiles:
-            st.session_state["all_profiles"] = profiles
-            st.success(f"✅ Завантажено профілів: {len(profiles)}")
-        else:
-            st.warning("⚠️ Список користувачів порожній.")
-    except Exception as e:
-        st.error("❌ Не вдалося завантажити список користувачів.")
-        st.exception(e)
+def get_users_profile():
+    supabase = init_supabase()
+    response = supabase.table("profiles").select("*").execute()
+    user_df = pd.DataFrame(response.data)
+    return user_df
 
 def show_data():
 
