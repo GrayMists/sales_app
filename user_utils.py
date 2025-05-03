@@ -8,6 +8,18 @@ else:
     st.stop()  # Зупиняє виконання коду, якщо немає підключення
 
 
+def load_all_profiles(supabase):
+    try:
+        response = supabase.table("profiles").select("*").execute()
+        profiles = response.data
+        if profiles:
+            st.session_state["all_profiles"] = profiles
+        else:
+            st.warning("Список користувачів порожній.")
+    except Exception as e:
+        st.error("Не вдалося завантажити список користувачів.")
+        st.exception(e)
+
 def show_data():
 
     if "user" in st.session_state:

@@ -12,7 +12,6 @@ def show_data():
     df = st.session_state.df
     #Перевірка на користувача. 
     #Щоб Інформація фільтрувалась під користувача і в подальшому оброблялась
-    if email == "andrew.puliak@gmail.com":
-        df_for_mr = df[df["Регіон"] == "24. Тернопіль"]
+    
                 
-    st.write(df_for_mr)
+    st.write(df)

@@ -1,6 +1,6 @@
 import streamlit as st
+import pandas as pd
 from data_cleaner import process_filtered_df
-
 
 
 
@@ -80,5 +80,7 @@ def show_data():
         with st.expander("Всі дані по регіону"):
             st.dataframe(filtered_df)
     else:
-        st.subheader("Всі дані по регіону")
-        st.dataframe(filtered_df)
+        region_list = st.selectbox('оберіть регіон',df['Регіон'].unique())
+        
+        with st.expander("Всі дані по регіону"):
+            st.dataframe(filtered_df)
