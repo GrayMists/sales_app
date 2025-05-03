@@ -5,7 +5,6 @@ from supabase import create_client, Client
 url = st.secrets["SUPABASE_URL"]
 key = st.secrets["SUPABASE_KEY"]
 
-
 # Перевірка чи вже є клієнт у session_state
 if "supabase" not in st.session_state:
     st.session_state.supabase = create_client(url, key)
