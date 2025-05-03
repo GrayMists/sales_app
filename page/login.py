@@ -17,8 +17,11 @@ def init_supabase():
 
 supabase = init_supabase()
 
+def clear_cache():
+    st.session_state.clear()
 
 def show_login_data():
+    clear_cache()
     st.title("Увійдіть у свій аккаунт")
 
     if "user" not in st.session_state:
