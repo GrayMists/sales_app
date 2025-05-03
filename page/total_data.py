@@ -112,12 +112,25 @@ def show_data():
         with st.expander("Всі дані по регіону"):
             st.dataframe(filtered_df)
     else:
-        users = get_users_profile()   
-        med_rep = (users[(users['region'] == select_region) & (users['type'] != 'admin')])
-        select_user_for_view = st.selectbox("Оберіть медпредставника",med_rep['full_name'].unique(), key='select_user_for_view')
-        user_for_view = med_rep.drop(['id','email',"nickname"], axis=1).reset_index()
-        
-        select_user = user_for_view[user_for_view['full_name'] == select_user_for_view]
-        st.write(select_user)
-        med_rep_final_df = filtered_df[(filtered_df['Територія'] == select_user['territory'].iloc[0]) & (filtered_df['Лінія'] == select_user['line'].iloc[0])]
-        st.dataframe(med_rep_final_df)
+        users = get_users_profile()
+
+        # Перевірка на порожні дані
+        if users.empty:
+            st.warning("Не знайдено даних про користувачів.")
+        else:
+            med_rep = users[(users['region'] == select_region) & (users['type'] != 'admin')]
+            
+            if med_rep.empty:
+                st.warning("Не знайдено медпредставників для вибраного регіону.")
+            else:
+                select_user_for_view = st.selectbox("Оберіть медпредставника", med_rep['full_name'].unique(), key='select_user_for_view')
+                user_for_view = med_rep.drop(['id', 'email', "nickname"], axis=1).reset_index()
+
+                select_user = user_for_view[user_for_view['full_name'] == select_user_for_view]
+
+                if select_user.empty:
+                    st.warning("Не знайдено медпредставника за вибраним іменем.")
+                else:
+                    st.write(select_user)
+                    med_rep_final_df = filtered_df[(filtered_df['Територія'] == select_user['territory'].iloc[0]) & (filtered_df['Лінія'] == select_user['line'].iloc[0])]
+                    st.dataframe(med_rep_final_df)
