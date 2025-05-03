@@ -1,11 +1,12 @@
 import streamlit as st
 import pandas as pd
 from data_cleaner import process_filtered_df
-
+from .login import supabase
 
 
 
 def show_data():
+
     # Перевірка наявності даних у сесії
     profile = st.session_state.get("profile")
     if not profile:
@@ -29,6 +30,8 @@ def show_data():
         return
     #Логіка якщо зайшов користувач з типом адмін, в нього має бути доступ до всіх регіонів
     if type == "admin":
+        # Переконайтесь, що профілі завантажені
+        
         select_region = st.selectbox(
             "Оберіть регіон",
             df["Регіон"].unique(),
@@ -50,6 +53,7 @@ def show_data():
         filtered_df = process_filtered_df(df, region, city)
     #Якщо зайшов користувач з типом не адмін
     if type != "admin":
+
         # Фільтрація та обробка даних
         mr_df = filtered_df[
             (filtered_df["Територія"] == profile["territory"])&
@@ -108,6 +112,25 @@ def show_data():
             st.dataframe(filtered_df[~filtered_df["Територія"].isin(["Територія 1", "Територія 2"])])
         with st.expander("Всі дані по регіону"):
             st.dataframe(filtered_df)
-    else:
- 
+    else:   
+        # if "supabase" not in st.session_state:
+        #     # Ініціалізація supabase тільки якщо його немає в session_state
+        #     st.session_state.supabase = supabase  # Переконайтесь, що ви правильно ініціалізуєте supabase
+
+        # # Тепер ви можете використовувати supabase з session_state
+        # supabase = st.session_state.supabase
+
+        response = supabase.table("profiles").select("*").execute()
+
+        # Виведення відповіді з Supabase для перевірки
+        st.write("📦 Відповідь з Supabase:", response)
+
+        if response.data:
+            profiles = response.data
+            st.session_state["all_profiles"] = profiles  # Зберігаємо у session_state
+        else:
+            profiles = []
+            st.warning("Не знайдено профілів у базі даних.")
+
+        st.write(st.session_state)
         st.dataframe(filtered_df)

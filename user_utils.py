@@ -1,23 +1,27 @@
 import streamlit as st
 
 
-if "supabase" in st.session_state:
-    supabase = st.session_state.supabase
-else:
-    st.error("Підключення до Supabase відсутнє. Будь ласка, увійдіть знову.")
-    st.stop()  # Зупиняє виконання коду, якщо немає підключення
+
 
 
 def load_all_profiles(supabase):
+    if supabase is None:
+        if "supabase" not in st.session_state:
+            st.error("❌ Немає підключення до Supabase.")
+            return
+        supabase = st.session_state.supabase
+
     try:
         response = supabase.table("profiles").select("*").execute()
+        st.write("📦 Відповідь з Supabase:", response)  # <-- Додано
         profiles = response.data
         if profiles:
             st.session_state["all_profiles"] = profiles
+            st.success(f"✅ Завантажено профілів: {len(profiles)}")
         else:
-            st.warning("Список користувачів порожній.")
+            st.warning("⚠️ Список користувачів порожній.")
     except Exception as e:
-        st.error("Не вдалося завантажити список користувачів.")
+        st.error("❌ Не вдалося завантажити список користувачів.")
         st.exception(e)
 
 def show_data():
