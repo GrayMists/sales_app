@@ -16,7 +16,7 @@ def show_data():
 
     region = profile.get("region")
     line = profile.get("line")
-    type = profile.get("type")
+    user_type = profile.get("type")
     city_raw = profile.get("city")
     if isinstance(city_raw, str):
         city = [c.strip() for c in city_raw.split(",")]
@@ -30,7 +30,7 @@ def show_data():
         st.warning("Спочатку завантажте файл на сторінці 'Завантаження'")
         return
     #Логіка якщо зайшов користувач з типом адмін, в нього має бути доступ до всіх регіонів
-    if type == "admin":
+    if user_type == "admin":
         select_region = st.selectbox(
             "Оберіть регіон",
             df["Регіон"].unique(),
@@ -49,9 +49,9 @@ def show_data():
     
         filtered_df = process_filtered_df(df, select_region, selected_city)
     else:
-        filtered_df = process_filtered_df(df, region, city)
+        filtered_df = process_filtered_df(df, region, city[0])
     #Якщо зайшов користувач з типом не адмін
-    if type != "admin":
+    if user_type != "admin":
         
         # Фільтрація та обробка даних
         mr_df = filtered_df[
@@ -61,6 +61,8 @@ def show_data():
         # зберігаємо інформацію
         st.session_state["mr_df"] = mr_df
         st.subheader(f"Дані по території користувача {full_name}")
+
+
         # Групування по продуктах з загальною сумою продаж
         group_by_product = mr_df.groupby("Найменування")["Кількість"].sum().reset_index()
         # Групування по населених пунктах з сумою продаж
@@ -95,15 +97,29 @@ def show_data():
                 st.dataframe(group_by_city, use_container_width=True, hide_index=True, height=487)
                 
             with st.expander("Продажі у вибраному населеному пункті (натисніть для перегляду)",icon="⬇️"):
-                unique_city = st.selectbox('Оберіть населений пункт',mr_df["Місто"].unique(),key='select_city')
-                group_by_city_product = mr_df[mr_df["Місто"] == unique_city].groupby(["Місто", "Найменування"])["Кількість"].sum().reset_index()
-                st.dataframe(group_by_city_product, use_container_width=True, hide_index=True)
-            with st.expander("Продажі у вибраному населеному пункті по вулицях (натисніть для перегляду)",icon="⬇️"):
-                unique_city_street = st.selectbox('Оберіть населений пункт',mr_df["Місто"].unique(),key='select_city_streer')
-                filtered_streets = mr_df[mr_df["Місто"] == unique_city_street]["Вулиця"].unique()
-                unique_street = st.selectbox('Оберіть вулицю',filtered_streets,key='select_streer')
-                group_by_street_product = mr_df[(mr_df["Місто"] == unique_city_street) & (mr_df["Вулиця"] == unique_street)].groupby(["Місто","Вулиця", "Найменування"])["Кількість"].sum().reset_index()
+                col5, col6 = st.columns([2,3])
+                with col5:
+                    unique_city = st.selectbox(
+                        'Оберіть населений пункт',
+                        mr_df["Місто"].unique(),
+                        key='select_city'
+                    )
+                    filtered_streets = mr_df[mr_df["Місто"] == unique_city]["Вулиця"].unique()
+                    unique_street = st.selectbox(
+                        'Оберіть вулицю',
+                        filtered_streets,
+                        key='select_streer'
+                    )
+                with col6:
+                    group_by_city_product = mr_df[mr_df["Місто"] == unique_city].groupby(["Місто", "Найменування"])["Кількість"].sum().reset_index()
+                    st.text('Продажі в обраному населеному пункті')
+                    st.dataframe(group_by_city_product, use_container_width=True, hide_index=True)
+            
+                temp_df = mr_df[(mr_df["Місто"] == unique_city) & (mr_df["Вулиця"] == unique_street)].copy()
+                temp_df["Адреса"] = temp_df["Вулиця"] + ", " + temp_df["Номер будинку"]
+                group_by_street_product = temp_df.groupby(["Місто", "Адреса", "Найменування"])["Кількість"].sum().reset_index()
                 st.dataframe(group_by_street_product.drop(columns=["Місто"]), use_container_width=True, hide_index=True)
+                st.write(group_by_street_product.pivot_table(index=['Адреса'], columns=["Найменування"], values=["Кількість"], fill_value=0))
         # Виведення таблиці
         with st.expander("Не розприділені дані"):
             st.dataframe(filtered_df[~filtered_df["Територія"].isin(["Територія 1", "Територія 2"])])
@@ -171,8 +187,8 @@ def show_data():
                                     st.dataframe(group_by_city_med_rep, use_container_width=True, hide_index=True, height=487)
                                 
                                 with st.expander("Продажі у вибраному населеному пункті (натисніть для перегляду)",icon="⬇️"):
-                                    col5, col6 = st.columns(2)
-                                    with col5:
+                                    col7, col8 = st.columns([2,3])
+                                    with col7:
                                         unique_city = st.selectbox(
                                             'Оберіть населений пункт',
                                             med_rep_final_df["Місто"].unique(),
@@ -185,11 +201,15 @@ def show_data():
                                             key=f'select_streer_med_rep_{user_row["full_name"]}'
                                         )
 
-                                    with col6:
+                                    with col8:
                                         group_by_city_product = med_rep_final_df[med_rep_final_df["Місто"] == unique_city].groupby(["Місто", "Найменування"])["Кількість"].sum().reset_index()
                                         st.text('Продажі в обраному населеному пункті')
                                         st.dataframe(group_by_city_product, use_container_width=True, hide_index=True)
-                                    group_by_street_product = med_rep_final_df[(med_rep_final_df["Місто"] == unique_city) & (med_rep_final_df["Вулиця"] == unique_street)].groupby(["Місто","Вулиця", "Найменування"])["Кількість"].sum().reset_index()
+                                    #group_by_street_product = med_rep_final_df[(med_rep_final_df["Місто"] == unique_city) & (med_rep_final_df["Вулиця"] == unique_street)].groupby(["Місто","Вулиця","Номер будинку", "Найменування"])["Кількість"].sum().reset_index()
+                                    temp_df = med_rep_final_df[(med_rep_final_df["Місто"] == unique_city) & (med_rep_final_df["Вулиця"] == unique_street)].copy()
+                                    temp_df["Адреса"] = temp_df["Вулиця"] + ", " + temp_df["Номер будинку"]
+                                    group_by_street_product = temp_df.groupby(["Місто", "Адреса", "Найменування"])["Кількість"].sum().reset_index()
                                     st.dataframe(group_by_street_product.drop(columns=["Місто"]), use_container_width=True, hide_index=True)
+                                    st.write(group_by_street_product.pivot_table(index=['Адреса'], columns=["Найменування"], values=["Кількість"], fill_value=0))
                       
 
