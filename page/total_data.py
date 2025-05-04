@@ -112,7 +112,6 @@ def show_data():
     else:
         
         users = get_users_profile()
-        st.write(users)
 
         # Перевірка на порожні дані
         if users.empty:
@@ -123,14 +122,74 @@ def show_data():
             if med_rep.empty:
                 st.warning("Не знайдено медпредставників для вибраного регіону.")
             else:
-                select_user_for_view = st.selectbox("Оберіть медпредставника", med_rep['full_name'].unique(), key='select_user_for_view')
-                user_for_view = med_rep.drop(['id', 'email', "nickname"], axis=1).reset_index()
+                med_rep = med_rep.drop(['id', 'email', "nickname"], axis=1).reset_index(drop=True)
 
-                select_user = user_for_view[user_for_view['full_name'] == select_user_for_view]
+                tab_titles = [f"{user}" for user in med_rep["full_name"]]
+                tabs = st.tabs(tab_titles)
 
-                if select_user.empty:
-                    st.warning("Не знайдено медпредставника за вибраним іменем.")
-                else:
-                    st.write(select_user)
-                    med_rep_final_df = filtered_df[(filtered_df['Територія'] == select_user['territory'].iloc[0]) & (filtered_df['Лінія'] == select_user['line'].iloc[0])]
-                    st.dataframe(med_rep_final_df)
+                for tab, (_, user_row) in zip(tabs, med_rep.iterrows()):
+                    with tab:
+                        st.subheader(f"Дані для {user_row['full_name']}")
+                        med_rep_final_df = filtered_df[
+                            (filtered_df["Територія"] == user_row["territory"]) &
+                            (filtered_df["Лінія"] == user_row["line"])
+                        ]
+                        if med_rep_final_df.empty:
+                            st.info("Немає даних для цього медпредставника.")
+                        else:
+                            with st.expander("Таблиця продаж"):
+                                st.dataframe(med_rep_final_df, use_container_width=True)
+                            # Групування по продуктах з загальною сумою продаж
+                            group_by_product_med_rep = med_rep_final_df.groupby("Найменування")["Кількість"].sum().reset_index()
+                            # Групування по населених пунктах з сумою продаж
+                            group_by_city_med_rep = med_rep_final_df.groupby("Місто")["Кількість"].sum().reset_index()
+                            col1, col2 = st.columns([2,5])
+
+                            with col1:
+                                st.markdown("""
+                                ##### Загальні продажі
+                                """)
+                                # відображення в 1 колонці загальні продажі по продуктах
+                                st.dataframe(group_by_product_med_rep, use_container_width=True, hide_index=True, height=(len(group_by_product_med_rep) * 36))
+                            with col2:
+                                col3, col4 = st.columns(2)
+                                
+                                with col3:
+                                    st.markdown("""
+                                    ##### ТОП-5 найкращих
+                                    """)
+                                    st.dataframe(group_by_product_med_rep.sort_values(by = "Кількість", ascending=False).head(5),  hide_index=True)
+
+                                    st.markdown("""
+                                    ##### ТОП-5 найгірших
+                                    """)
+                                    st.dataframe(group_by_product_med_rep.sort_values(by = "Кількість", ascending=True).head(5),  hide_index=True)
+
+                                        
+                                with col4:
+                                    st.markdown("""##### Продажі в населених пунктах""")
+                                    st.dataframe(group_by_city_med_rep, use_container_width=True, hide_index=True, height=487)
+                                
+                                with st.expander("Продажі у вибраному населеному пункті (натисніть для перегляду)",icon="⬇️"):
+                                    col5, col6 = st.columns(2)
+                                    with col5:
+                                        unique_city = st.selectbox(
+                                            'Оберіть населений пункт',
+                                            med_rep_final_df["Місто"].unique(),
+                                            key=f'select_city_med_rep_{user_row["full_name"]}'
+                                        )
+                                        filtered_streets = med_rep_final_df[med_rep_final_df["Місто"] == unique_city]["Вулиця"].unique()
+                                        unique_street = st.selectbox(
+                                            'Оберіть вулицю',
+                                            filtered_streets,
+                                            key=f'select_streer_med_rep_{user_row["full_name"]}'
+                                        )
+
+                                    with col6:
+                                        group_by_city_product = med_rep_final_df[med_rep_final_df["Місто"] == unique_city].groupby(["Місто", "Найменування"])["Кількість"].sum().reset_index()
+                                        st.text('Продажі в обраному населеному пункті')
+                                        st.dataframe(group_by_city_product, use_container_width=True, hide_index=True)
+                                    group_by_street_product = med_rep_final_df[(med_rep_final_df["Місто"] == unique_city) & (med_rep_final_df["Вулиця"] == unique_street)].groupby(["Місто","Вулиця", "Найменування"])["Кількість"].sum().reset_index()
+                                    st.dataframe(group_by_street_product.drop(columns=["Місто"]), use_container_width=True, hide_index=True)
+                      
+
