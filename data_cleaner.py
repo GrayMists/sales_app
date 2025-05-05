@@ -13,7 +13,9 @@ from dictionaries.replacement_street_dictionaries import (
 )
 from dictionaries.mr_dictionary import (
     territory_ternopil_mr,
-    street_ternopil_territory
+    street_ternopil_territory,
+    territory_frankivsk_mr,
+    street_frankivsk_territory
 )
 from dictionaries.product_dictionaryes import products_dict
 # Функція видалення лишніх знаків та пробілів
@@ -119,8 +121,8 @@ def process_filtered_df(df, region_name,city):
         region_values = remove_values_from_frankivsk
         city_values = replace_frankivsk_city_dict
         street_values = replace_frankivsk_street_dict
-        street_mr = {}  
-        territory = {}  
+        street_mr = street_frankivsk_territory  
+        territory = territory_frankivsk_mr  
     elif region_name == "Ужгородська":
         region_values = []
         city_values = {}

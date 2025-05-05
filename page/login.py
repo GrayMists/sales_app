@@ -8,7 +8,6 @@ url = st.secrets["SUPABASE_URL"]
 key = st.secrets["SUPABASE_KEY"]
 
 
-
 # Ініціалізація клієнта Supabase
 def init_supabase():
     if "supabase" not in st.session_state:

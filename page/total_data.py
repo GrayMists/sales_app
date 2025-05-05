@@ -52,11 +52,16 @@ def show_data():
         filtered_df = process_filtered_df(df, region, city[0])
     #Якщо зайшов користувач з типом не адмін
     if user_type != "admin":
-        
         # Фільтрація та обробка даних
-        mr_df = filtered_df[
-            (filtered_df["Територія"] == profile["territory"])&
-            (filtered_df["Лінія"] == profile["line"])
+        if profile["line"] == "Загальна":
+            mr_df = filtered_df[
+                (filtered_df["Територія"] == profile["territory"]) &
+                (filtered_df["Лінія"].isin(["Лінія 1", "Лінія 2"]))
+            ]
+        else:
+            mr_df = filtered_df[
+                (filtered_df["Територія"] == profile["territory"]) &
+                (filtered_df["Лінія"] == profile["line"])
             ]
         # зберігаємо інформацію
         st.session_state["mr_df"] = mr_df
@@ -67,6 +72,7 @@ def show_data():
         group_by_product = mr_df.groupby("Найменування")["Кількість"].sum().reset_index()
         # Групування по населених пунктах з сумою продаж
         group_by_city = mr_df.groupby("Місто")["Кількість"].sum().reset_index()
+
         #будуємо колонки для відображення інформації
         col1, col2 = st.columns([2,5])
 
@@ -151,7 +157,9 @@ def show_data():
                             (filtered_df["Лінія"] == user_row["line"])
                         ]
                         if med_rep_final_df.empty:
+                            st.write(med_rep)
                             st.info("Немає даних для цього медпредставника.")
+                            st.write(filtered_df)
                         else:
                             with st.expander("Таблиця продаж"):
                                 st.dataframe(med_rep_final_df, use_container_width=True)
