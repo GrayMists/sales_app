@@ -153,15 +153,16 @@ def show_data():
                     with tab:
                         st.subheader(f"Дані для {user_row['full_name']}")
                         if user_row["line"] == "Загальна":
-                            mr_df = filtered_df[
+                            med_rep_final_df = filtered_df[
                                 (filtered_df["Територія"] == profile["territory"]) &
                                 (filtered_df["Лінія"].isin(["Лінія 1", "Лінія 2"]))
                             ]
                         else:
-                            mr_df = filtered_df[
+                            med_rep_final_df = filtered_df[
                                 (filtered_df["Територія"] == profile["territory"]) &
                                 (filtered_df["Лінія"] == user_row["line"])
                             ]
+
 
 
                         if med_rep_final_df.empty:
