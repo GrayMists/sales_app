@@ -227,5 +227,6 @@ def show_data():
                                     group_by_street_product = temp_df.groupby(["Місто", "Адреса", "Найменування"])["Кількість"].sum().reset_index()
                                     st.dataframe(group_by_street_product.drop(columns=["Місто"]), use_container_width=True, hide_index=True)
                                     st.write(group_by_street_product.pivot_table(index=['Адреса'], columns=["Найменування"], values=["Кількість"], fill_value=0))
-                      
+                            
+                        st.dataframe(med_rep_final_df)
 
