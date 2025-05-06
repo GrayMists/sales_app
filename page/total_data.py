@@ -152,10 +152,18 @@ def show_data():
                 for tab, (_, user_row) in zip(tabs, med_rep.iterrows()):
                     with tab:
                         st.subheader(f"Дані для {user_row['full_name']}")
-                        med_rep_final_df = filtered_df[
-                            (filtered_df["Територія"] == user_row["territory"]) &
-                            (filtered_df["Лінія"] == user_row["line"])
-                        ]
+                        if user_row["line"] == "Загальна":
+                            mr_df = filtered_df[
+                                (filtered_df["Територія"] == profile["territory"]) &
+                                (filtered_df["Лінія"].isin(["Лінія 1", "Лінія 2"]))
+                            ]
+                        else:
+                            mr_df = filtered_df[
+                                (filtered_df["Територія"] == profile["territory"]) &
+                                (filtered_df["Лінія"] == user_row["line"])
+                            ]
+
+
                         if med_rep_final_df.empty:
                             st.write(med_rep)
                             st.info("Немає даних для цього медпредставника.")
